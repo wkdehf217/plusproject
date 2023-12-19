@@ -2,6 +2,10 @@ package plus.plusproject.global.security.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import org.springframework.util.StreamUtils;
 import plus.plusproject.global.security.jwt.JwtUtil;
 import plus.plusproject.user.entity.UserRoleEnum;
 import plus.plusproject.global.security.userdetails.UserDetailsImpl;
@@ -20,7 +24,9 @@ import java.io.IOException;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
 	private final JwtUtil jwtUtil;
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public JwtAuthenticationFilter(JwtUtil jwtUtil) {
 		this.jwtUtil = jwtUtil;
@@ -60,6 +66,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 		log.info("로그인 실패");
+
+		response.getWriter().write("닉네임 또는 패스워드를 확인해주세요.");
+
 		response.setStatus(401);
 	}
 }
