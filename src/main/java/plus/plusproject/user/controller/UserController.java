@@ -23,9 +23,9 @@ public class UserController {
 	@PostMapping( "/auth/signup" )
 	public @ResponseBody ResponseEntity<ApiResponse> signup( @RequestBody UserRequestDto userRequestDto ) {
 
-		if(userService.getUsername(userRequestDto.getUsername()) != null){
+		if(!userService.getUsername(userRequestDto.getUsername())){
 			throw new AlreadyExistUsernameException();
-		}
+		};
 
 		this.emailService.sendEmailAuth( userRequestDto );
 

@@ -1,5 +1,6 @@
 package plus.plusproject.user.service;
 
+import plus.plusproject.global.exception.user.AlreadyExistUsernameException;
 import plus.plusproject.user.dto.UserRequestDto;
 import plus.plusproject.user.dto.UserResponseDto;
 import plus.plusproject.user.entity.EmailAuth;
@@ -35,11 +36,10 @@ public class UserService {
 		return userResponseDto;
 	}
 
-	public String getUsername( String username ) {
-		var user = this.userRepository.findByUsername( username )
-				.orElseThrow( ()-> new NoSuchElementException( "user id : " + username + " not exist." ) );
-
-		return user.getUsername();
+	public Boolean getUsername( String username ) {
+		var user = this.userRepository.findByUsername(username);
+//.orElseThrow(AlreadyExistUsernameException::new);
+		return user.isEmpty();
 	}
 
 	@Transactional
