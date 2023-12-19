@@ -35,6 +35,13 @@ public class UserService {
 		return userResponseDto;
 	}
 
+	public String getUsername( String username ) {
+		var user = this.userRepository.findByUsername( username )
+				.orElseThrow( ()-> new NoSuchElementException( "user id : " + username + " not exist." ) );
+
+		return user.getUsername();
+	}
+
 	@Transactional
 	public void updateUser( long userId, UserRequestDto userRequestDto ) {
 		User user = userRepository.findById(userId)

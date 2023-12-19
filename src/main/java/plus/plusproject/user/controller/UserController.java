@@ -1,5 +1,7 @@
 package plus.plusproject.user.controller;
 
+import plus.plusproject.global.exception.user.AlreadyExistUsernameException;
+import plus.plusproject.global.exception.user.ContainUsernameAndPassword;
 import plus.plusproject.user.dto.UserRequestDto;
 import plus.plusproject.global.response.ApiResponse;
 import plus.plusproject.global.security.userdetails.UserDetailsImpl;
@@ -20,6 +22,10 @@ public class UserController {
 
 	@PostMapping( "/auth/signup" )
 	public @ResponseBody ResponseEntity<ApiResponse> signup( @RequestBody UserRequestDto userRequestDto ) {
+
+		if(userService.getUsername(userRequestDto.getUsername()) != null){
+			throw new AlreadyExistUsernameException();
+		}
 
 		this.emailService.sendEmailAuth( userRequestDto );
 
