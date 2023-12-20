@@ -1,6 +1,9 @@
 package plus.plusproject.post.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import plus.plusproject.global.response.ApiResponse;
+import plus.plusproject.post.dto.PostPageRequestDto;
 import plus.plusproject.post.service.PostService;
 import plus.plusproject.global.security.userdetails.UserDetailsImpl;
 import plus.plusproject.post.dto.PostRequest;
@@ -52,13 +55,19 @@ public class PostController {
         ));
     }
 
+//    @GetMapping("/posts")
+//    public ResponseEntity<ApiResponse> readPostAll(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+//        return ResponseEntity.ok(ApiResponse.ok(
+//                postService.readPostAll(userDetailsImpl.getUser().getId())
+//        ));
+//    }
+
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse> readPostAll(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<ApiResponse> readPostAll(final Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.ok(
-                postService.readPostAll(userDetailsImpl.getUser().getId())
+                postService.readPostAll(pageable)
         ));
     }
-
 
     /**
      * Controller for postLike

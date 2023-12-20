@@ -1,7 +1,15 @@
 package plus.plusproject.post.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import plus.plusproject.post.dto.PostPageDto;
+import plus.plusproject.post.dto.PostPageRequestDto;
 import plus.plusproject.post.dto.PostRequest;
 import plus.plusproject.post.dto.PostResponse;
+import plus.plusproject.post.dto.PostResponseSimplify;
 import plus.plusproject.post.entity.PostLike;
 import plus.plusproject.user.entity.User;
 import plus.plusproject.post.repository.PostLikeRepository;
@@ -61,40 +69,24 @@ public class PostService {
                 .orElseThrow(NoSuchElementException::new);
         List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(postId);
         boolean myLike =
-                postLikeRepository.findByPost_IdAndUser_Id(postId, userId).size() != 0;
+                !postLikeRepository.findByPost_IdAndUser_Id(postId, userId).isEmpty();
 
         return new PostResponse(findPost, findPostLike, myLike);
     }
 
-    public List<PostResponse> readPostAll(Long userId) {
-        //1 + N 문제 해결 필요
-        List<Post> posts = postRepository.findAll();
-        List<PostResponse> response = new ArrayList<>();
-//        for (Post post : posts) {
-//            List<PostQueryResponse> res = postQueryRepository.readPost(userId, post.getId());
-//            response.add(new PostResponse(res.get(0), res.size()));
-//        }
+    public Page<Post> readPostAll(Pageable pageable) {
 
-        for (Post post : posts) {
-            List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(post.getId());
-            boolean myLike = postLikeRepository.findByPost_IdAndUser_Id(post.getId(), userId).size() != 0;
-            response.add(new PostResponse(post, findPostLike, myLike));
-        }
-
-        return response;
+        return postRepository.findAll(pageable);
     }
 
     public List<PostResponse> readPostAllByUser(Long userId, Long targetUserId) {
         List<Post> posts = postRepository.findAllByUser_Id(targetUserId);
         List<PostResponse> response = new ArrayList<>();
-//        for (Post post : posts) {
-//            List<PostQueryResponse> res = postQueryRepository.readPost(userId, post.getId());
-//            response.add(new PostResponse(res.get(0), res.size()));
-//        }
 
         for (Post post : posts) {
             List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(post.getId());
-            boolean myLike = postLikeRepository.findByPost_IdAndUser_Id(post.getId(), userId).size() != 0;
+            boolean myLike = !postLikeRepository.findByPost_IdAndUser_Id(post.getId(), userId)
+                    .isEmpty();
             response.add(new PostResponse(post, findPostLike, myLike));
         }
 

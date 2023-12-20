@@ -1,5 +1,6 @@
 package plus.plusproject.post.entity;
 
+import jakarta.validation.constraints.Size;
 import plus.plusproject.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +24,10 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Size(max = 500)
     private String title;
+
+    @Size(max = 5000)
     private String content;
 
     @CreatedDate
