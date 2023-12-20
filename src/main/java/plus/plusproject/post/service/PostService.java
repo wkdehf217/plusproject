@@ -2,8 +2,13 @@ package plus.plusproject.post.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.multipart.MultipartFile;
 import plus.plusproject.post.dto.PostRequest;
 import plus.plusproject.post.dto.PostResponse;
@@ -25,6 +30,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j(topic = "스케쥴러")
 public class PostService {
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
@@ -47,9 +53,30 @@ public class PostService {
 
     @Transactional
     public Post updatePost(User user, PostRequest request, Long postId) {
+
         Post post = postRepository.findByIdAndUser(postId, user)
                 .orElseThrow(NoSuchElementException::new);
+
         return post.update(request.getTitle(), request.getContent());
+    }
+
+
+    @Scheduled(cron = "10 * * * * *")
+    //@Scheduled(cron = "0 0 0 1 * *")
+    @Transactional
+    public void deletePostWithScheduler() {
+        List<Post> postList = postRepository.findAll();
+        for (Post post : postList){
+            LocalDateTime startDT = post.getLastModifiedAt();
+            LocalDateTime endDT = LocalDateTime.now();
+
+            Period diff = Period.between(startDT.toLocalDate(), endDT.toLocalDate());
+            if(diff.getDays() > 90){
+                postRepository.delete(post);
+            }
+        }
+        System.out.println("hi");
+        log.info("hihihi");
     }
 
     @Transactional
