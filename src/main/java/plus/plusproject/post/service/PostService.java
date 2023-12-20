@@ -1,15 +1,12 @@
 package plus.plusproject.post.service;
 
+import java.io.File;
+import java.io.IOException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import plus.plusproject.post.dto.PostPageDto;
-import plus.plusproject.post.dto.PostPageRequestDto;
+import org.springframework.web.multipart.MultipartFile;
 import plus.plusproject.post.dto.PostRequest;
 import plus.plusproject.post.dto.PostResponse;
-import plus.plusproject.post.dto.PostResponseSimplify;
 import plus.plusproject.post.entity.PostLike;
 import plus.plusproject.user.entity.User;
 import plus.plusproject.post.repository.PostLikeRepository;
@@ -37,13 +34,16 @@ public class PostService {
      * */
     @Transactional
     public Post createPost(User user, PostRequest request) {
+
         return postRepository.save(
                 Post.builder()
                         .user(user)
                         .title(request.getTitle())
-                        .content(request.getContent()).build()
+                        .content(request.getContent())
+                        .build()
         );
     }
+
     @Transactional
     public Post updatePost(User user, PostRequest request, Long postId) {
         Post post = postRepository.findByIdAndUser(postId, user)
@@ -116,5 +116,21 @@ public class PostService {
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(NoSuchElementException::new);
         postLikeRepository.deletePostLikeByUserAndPost(user, findPost);
+    }
+
+    @Transactional
+    public void uploadFile(User user, Long postId, MultipartFile multipartFile) throws IOException {
+
+        String fullPath="";
+        if(!multipartFile.isEmpty()){
+            fullPath = "C:/Users/wkdeh/OneDrive/바탕 화면/spartaSpring/" + multipartFile.getOriginalFilename();
+            multipartFile.transferTo(new File(fullPath));
+        }
+
+        Post post = postRepository.findByIdAndUser(postId, user)
+                .orElseThrow(NoSuchElementException::new);
+
+        post.uploadFile(fullPath);
+
     }
 }

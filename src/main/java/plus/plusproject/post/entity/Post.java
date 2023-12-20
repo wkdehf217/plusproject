@@ -30,6 +30,8 @@ public class Post {
     @Size(max = 5000)
     private String content;
 
+    private String fullPath;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -46,6 +48,11 @@ public class Post {
     public Post update(String title, String content) {
         this.title = title;
         this.content = content;
+        return this;
+    }
+
+    public Post uploadFile(String fullPath) {
+        this.fullPath = fullPath;
         return this;
     }
 }

@@ -1,7 +1,9 @@
 package plus.plusproject.post.controller;
 
+import java.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import plus.plusproject.global.response.ApiResponse;
 import plus.plusproject.post.dto.PostPageRequestDto;
 import plus.plusproject.post.service.PostService;
@@ -23,8 +25,14 @@ public class PostController {
      * */
     @PostMapping("/posts")
     public void createPost(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-                           @RequestBody PostRequest request) {
+                           @RequestBody PostRequest request){
         postService.createPost(userDetailsImpl.getUser(), request);
+    }
+
+    @PostMapping("/upload/{postId}")
+    public void uploadFile(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,  @PathVariable("postId") Long postId,
+            @RequestPart(value = "multipartFile")MultipartFile multipartFile) throws IOException {
+        postService.uploadFile(userDetailsImpl.getUser(), postId, multipartFile);
     }
 
     @PatchMapping("/posts/{postId}")
