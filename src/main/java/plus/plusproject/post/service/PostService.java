@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import plus.plusproject.post.dto.PostRequest;
 import plus.plusproject.post.dto.PostResponse;
+import plus.plusproject.post.dto.SimplePostResponse;
 import plus.plusproject.post.entity.PostLike;
 import plus.plusproject.user.entity.User;
 import plus.plusproject.post.repository.PostLikeRepository;
@@ -58,20 +59,23 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public PostResponse readPost(Long userId, Long postId) {
-//        List<PostQueryResponse> res = postQueryRepository.readPost(userId, postId);
-//        return PostResponse.builder()
-//                .res(res.get(0))
-//                .likeCount(res.size())
-//                .build();
+    public SimplePostResponse readPost(Long userId, Long postId) {
 
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(NoSuchElementException::new);
-        List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(postId);
-        boolean myLike =
-                !postLikeRepository.findByPost_IdAndUser_Id(postId, userId).isEmpty();
+        Post post = postRepository.findById(postId).orElseThrow(() ->
+                new NullPointerException("해당 게시글을 찾을 수 없습니다.")
+        );
 
-        return new PostResponse(findPost, findPostLike, myLike);
+        return new SimplePostResponse(post);
+//        Post findPost = postRepository.findById(postId)
+//                .orElseThrow(NoSuchElementException::new);
+//        List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(postId);
+//        boolean myLike =
+//                !postLikeRepository.findByPost_IdAndUser_Id(postId, userId).isEmpty();
+//
+//
+//        return new PostResponse(findPost, findPostLike, myLike);
+
+
     }
 
     public Page<Post> readPostAll(Pageable pageable) {
