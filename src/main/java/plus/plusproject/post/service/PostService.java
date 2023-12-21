@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.multipart.MultipartFile;
+import plus.plusproject.comment.entity.Comment;
+import plus.plusproject.comment.service.CommentService;
 import plus.plusproject.post.dto.PostRequest;
 import plus.plusproject.post.dto.PostResponse;
 import plus.plusproject.post.dto.SimplePostResponse;
@@ -35,6 +37,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentService commentService;
 
     /**
      * Service for post
@@ -61,8 +64,8 @@ public class PostService {
     }
 
 
-    @Scheduled(cron = "10 * * * * *")
-    //@Scheduled(cron = "0 0 0 1 * *")
+    //@Scheduled(cron = "10 * * * * *")
+    @Scheduled(cron = "0 0 0 1 * *")
     @Transactional
     public void deletePostWithScheduler() {
         List<Post> postList = postRepository.findAll();
@@ -73,10 +76,11 @@ public class PostService {
             Period diff = Period.between(startDT.toLocalDate(), endDT.toLocalDate());
             if(diff.getDays() > 90){
                 postRepository.delete(post);
+                System.out.println("기간만료 삭제");
+                log.info("기간만료 삭제");
             }
         }
-        System.out.println("hi");
-        log.info("hihihi");
+
     }
 
     @Transactional
@@ -92,7 +96,13 @@ public class PostService {
                 new NullPointerException("해당 게시글을 찾을 수 없습니다.")
         );
 
-        return new SimplePostResponse(post);
+        List<Comment> commentList = commentService.findById(post.getId());
+        List<Long> commentIdList = new ArrayList<>();
+
+        for(Comment comment : commentList){
+            commentIdList.add(comment.getCommentId());
+        }
+        return new SimplePostResponse(post,commentIdList);
 //        Post findPost = postRepository.findById(postId)
 //                .orElseThrow(NoSuchElementException::new);
 //        List<PostLike> findPostLike = postLikeRepository.findByPost_IdOrderByCreatedAtDesc(postId);

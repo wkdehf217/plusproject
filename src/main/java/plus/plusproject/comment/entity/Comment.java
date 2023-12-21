@@ -1,5 +1,6 @@
 package plus.plusproject.comment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import plus.plusproject.user.entity.User;
 import plus.plusproject.comment.dto.CommentRequestDto;
 import plus.plusproject.post.entity.Post;
@@ -51,6 +52,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
     private Post post;
 
 

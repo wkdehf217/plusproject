@@ -1,32 +1,38 @@
 package plus.plusproject.comment.service;
 
-import plus.plusproject.comment.entity.Comment;
-import plus.plusproject.comment.entity.CommentLike;
-import plus.plusproject.user.entity.User;
-import plus.plusproject.comment.dto.CommentQueryResponse;
-import plus.plusproject.comment.dto.CommentRequestDto;
-import plus.plusproject.comment.dto.CommentResponseDto;
-import plus.plusproject.comment.entity.CommentLikeKey;
-import plus.plusproject.post.entity.Post;
-import plus.plusproject.comment.repository.CommentLikeRepository;
-import plus.plusproject.comment.repository.CommentQueryRepository;
-import plus.plusproject.comment.repository.CommentRepository;
-import plus.plusproject.post.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import plus.plusproject.comment.dto.CommentQueryResponse;
+import plus.plusproject.comment.dto.CommentRequestDto;
+import plus.plusproject.comment.dto.CommentResponseDto;
+import plus.plusproject.comment.entity.Comment;
+import plus.plusproject.comment.entity.CommentLike;
+import plus.plusproject.comment.entity.CommentLikeKey;
+import plus.plusproject.comment.repository.CommentLikeRepository;
+import plus.plusproject.comment.repository.CommentQueryRepository;
+import plus.plusproject.comment.repository.CommentRepository;
+import plus.plusproject.post.entity.Post;
+import plus.plusproject.post.repository.PostRepository;
+import plus.plusproject.user.entity.User;
 
 @Service
 @RequiredArgsConstructor
 public class CommentService {
+
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentQueryRepository commentQueryRepository;
+
+    public List<Comment> findById(Long postId) {
+
+        return commentRepository.findAllByPost_Id(postId);
+    }
 
     public List<CommentResponseDto> getComment(Long userId, Long postId) {
         List<Comment> comments = commentRepository.findAllByPost_Id(postId);
@@ -41,7 +47,8 @@ public class CommentService {
             }
         } else {
             for (Comment comment : comments) {
-                List<CommentQueryResponse> res = commentQueryRepository.getCommentDetail(userId, comment.getCommentId());
+                List<CommentQueryResponse> res = commentQueryRepository.getCommentDetail(userId,
+                        comment.getCommentId());
                 if (res.isEmpty()) {
                     response.add(
                             CommentResponseDto.commentNoResponseDtoBuilder()
@@ -75,8 +82,7 @@ public class CommentService {
             return CommentResponseDto.commentNoResponseDtoBuilder()
                     .comment(comment)
                     .build();
-        }
-        else{
+        } else {
             return CommentResponseDto.commentResponseDtoBuilder()
                     .res(res.get(0))
                     .likeCount(res.size())
@@ -98,7 +104,8 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment createReply(User user, Long postId, Long parentCommentId, CommentRequestDto requestDto) {
+    public Comment createReply(User user, Long postId, Long parentCommentId,
+            CommentRequestDto requestDto) {
         Post post = postRepository.findById(postId).orElseThrow(() ->
                 new NullPointerException("해당 게시글을 찾을 수 없습니다.")
         );
@@ -156,4 +163,8 @@ public class CommentService {
     }
 
 
+    public Object getCommentPageble(Pageable pageable, Long postId) {
+
+        return commentRepository.findAllByPostId(postId,pageable);
+    }
 }

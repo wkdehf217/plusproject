@@ -1,6 +1,7 @@
 package plus.plusproject.comment.controller;
 
 
+import org.springframework.data.domain.Pageable;
 import plus.plusproject.comment.dto.CommentRequestDto;
 import plus.plusproject.global.response.ApiResponse;
 import plus.plusproject.global.security.userdetails.UserDetailsImpl;
@@ -17,12 +18,20 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<ApiResponse> getComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @PathVariable("postId") Long postId) {
+    public ResponseEntity<ApiResponse> getCommentPageable(final Pageable pageable,
+            @PathVariable("postId") Long postId ) {
         return ResponseEntity.ok(ApiResponse.ok(
-                commentService.getComment(userDetails.getUser().getId(), postId)
+                commentService.getCommentPageble(pageable,postId)
         ));
     }
+
+//    @GetMapping("/{postId}/comments")
+//    public ResponseEntity<ApiResponse> getComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
+//                                                  @PathVariable("postId") Long postId) {
+//        return ResponseEntity.ok(ApiResponse.ok(
+//                commentService.getComment(userDetails.getUser().getId(), postId)
+//        ));
+//    }
 
     @GetMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<ApiResponse> getCommentDetail(@AuthenticationPrincipal UserDetailsImpl userDetails,

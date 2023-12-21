@@ -1,6 +1,9 @@
 package plus.plusproject.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Size;
+import java.util.List;
+import plus.plusproject.comment.entity.Comment;
 import plus.plusproject.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,13 +19,18 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "post_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
+
+//    @OneToMany
+//    private List<Comment> comments;
 
     @Size(max = 500)
     private String title;
