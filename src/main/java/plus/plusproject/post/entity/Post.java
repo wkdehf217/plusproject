@@ -29,8 +29,8 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @OneToMany
-//    private List<Comment> comments;
+    @OneToMany(mappedBy = "post", orphanRemoval = true)
+    private List<Comment> comments;
 
     @Size(max = 500)
     private String title;
